@@ -96,15 +96,3 @@ src/
 | `npm run dev` | 启动开发服务器（HMR） |
 | `npm run build` | 生产构建，产物输出到 `dist/` |
 | `npm run preview` | 本地预览生产产物 |
-
-## 已知限制
-
-1. **计时器状态不跨刷新持久化**：`running`/`deadline` 为内存态，刷新页面后计时停止，需手动重新开始（需求未要求跨刷新续跑）。
-2. **`currentTaskId` 不持久化**：刷新页面后当前专注任务归空，完成专注时 session 的 `taskId` 可能为 `null`（待修复项）。
-3. **`useStats.load` 无竞态保护**：快速切换 7/30 天范围时，后完成的请求可能覆盖前一次结果，导致图表与按钮短暂不一致（待修复项）。
-4. **`useTask` 的 toggle/remove/clearAll 无 `submitting` 锁**：快速连点会发送重复请求，离线时重复入 pending 队列（待修复项；add/edit 已加锁）。
-5. **暂停剩余时间最大 250ms 误差**：`pause` 未先刷新 `now` 即取 `remaining`，因 250ms ticker 频率导致冻结值最多滞后一个 tick；误差不累积。
-6. **运行中改配置 progress 短暂不准**：`applyConfig` 运行态不改 `deadline`（不打断计时），但 `progress` 分母响应式联动新时长，进度环短暂比例错乱；App.vue 紧接 `reset` 缓解。
-7. **后端需接受客户端生成的 id**：离线新增任务用 `Date.now()` 作 id，恢复网络重放时若服务端拒绝客户端 id，需后端配合返回新 id 并由下次 GET 对齐。
-8. **Apifox Mock 需独立启动**：未配置 Mock 服务时所有 API 超时，自动 fallback 到 LocalStorage，功能可用但无远端数据。
-
